@@ -1,24 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { ChangeEvent, ElementType, useState } from "react";
+import { usePeopleList } from "./reducers/peopleList";
 
-function App() {
+const App = () => {
+
+  const [listPeople, actions] = usePeopleList();
+  const [personInputName, setPersonInputName] = useState('');
+
+  const handleInputPersonInputName = (e: ChangeEvent<HTMLInputElement>) => {
+    setPersonInputName( e.target.value )
+  }
+
+  const handleAddPerson = () => {
+    if(personInputName) {
+      actions({ type: "ADD", payload: { name: personInputName } });
+      setPersonInputName('');
+    }
+  }
+
+  const deletePerson = (id: string) => {
+      actions({
+        type: 'DEL', payload: { id }
+      })
+  }
+
+  const handleOrderList = () => {
+    actions({ type: "ORDER" });
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <input type="text" value={personInputName} onChange={handleInputPersonInputName} />
+      <button onClick={handleAddPerson}>Adicionar</button>
+
+      <hr />
+      <button onClick={handleOrderList}>Ordernar nomes</button>
+
+      <h2>Lista de pessoas: </h2>
+      <ul>
+      {listPeople.map((person) => (
+        <li key={person.id}>
+          <button onClick={() => deletePerson(person.id)}>[ DELETAR ]</button>
+          <span style={{ marginLeft: "1rem" }}>{person.name}</span>
+        </li>
+      ))}
+      </ul>
     </div>
   );
 }
